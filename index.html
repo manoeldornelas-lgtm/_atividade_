@@ -1,836 +1,720 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cafeteria Nordeste — Cardápio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --espresso: #1E140F;
-    --espresso-2: #2A1D16;
-    --espresso-3: #362518;
-    --cream: #F2E6D3;
-    --cream-dim: #D8C7AC;
-    --clay: #BB6132;
-    --clay-bright: #D6803F;
-    --gold: #C79A44;
-    --forest: #4B5A3C;
-    --paper: #EDE2CD;
-    --paper-2: #E4D6B9;
-    --line: rgba(242,230,211,0.14);
-    --shadow: 0 20px 50px rgba(0,0,0,0.35);
-    --font-display: 'Fraunces', serif;
-    --font-body: 'Manrope', sans-serif;
-    --font-mono: 'Space Mono', monospace;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinanceHub - Suas Finanças</title>
+    <!-- Chart.js para o gráfico -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #475569;
+            --border: #e2e8f0;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
+            --input-bg: #f8fafc;
+        }
 
-  *{ box-sizing: border-box; }
-  html{ scroll-behavior: smooth; }
-  body{
-    margin:0;
-    background: var(--espresso);
-    color: var(--cream);
-    font-family: var(--font-body);
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-  img,svg{ display:block; }
-  button{ font-family: inherit; }
+        .dark {
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --primary: #60a5fa;
+            --primary-hover: #3b82f6;
+            --success: #34d399;
+            --danger: #f87171;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+            --input-bg: #1e293b;
+        }
 
-  a{ color: inherit; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  ::selection{ background: var(--clay); color: var(--espresso); }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s, color 0.3s;
+            padding: 20px;
+        }
 
-  /* texture */
-  body::before{
-    content:"";
-    position: fixed; inset:0;
-    pointer-events:none;
-    z-index: 0;
-    background-image:
-      radial-gradient(circle at 20% 20%, rgba(242,230,211,0.03), transparent 40%),
-      radial-gradient(circle at 80% 60%, rgba(187,97,50,0.06), transparent 45%);
-  }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            transition: background 0.3s;
+        }
 
-  .wrap{
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 24px;
-    position: relative;
-    z-index: 1;
-  }
+        .app-container {
+            max-width: 960px;
+            width: 100%;
+        }
 
-  /* ============ HEADER / QUADRO-NEGRO ============ */
-  header.board{
-    background:
-      linear-gradient(180deg, rgba(0,0,0,0.15), rgba(0,0,0,0) 30%),
-      var(--espresso-2);
-    border-bottom: 1px solid var(--line);
-    padding: 28px 0 0;
-  }
-  .board-inner{
-    display:flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 24px;
-    flex-wrap: wrap;
-    padding-bottom: 22px;
-  }
-  .brand{
-    display:flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .brand-mark{
-    display:flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .brand-mark svg{ width: 42px; height: 42px; flex-shrink: 0; }
-  .brand h1{
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: clamp(28px, 4vw, 40px);
-    margin: 0;
-    letter-spacing: 0.01em;
-    color: var(--cream);
-  }
-  .brand h1 em{
-    font-style: italic;
-    color: var(--clay-bright);
-    font-weight: 500;
-  }
-  .tagline{
-    font-style: italic;
-    font-family: var(--font-display);
-    color: var(--cream-dim);
-    font-size: 15px;
-    margin: 0 0 0 54px;
-  }
+        h1, h2, h3 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
 
-  .status-block{
-    text-align: right;
-    display:flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-  }
-  .status-pill{
-    display:inline-flex;
-    align-items:center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 100px;
-    border: 1px solid var(--line);
-    background: rgba(0,0,0,0.2);
-  }
-  .status-dot{
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--forest);
-    box-shadow: 0 0 0 3px rgba(75,90,60,0.25);
-  }
-  .status-pill.closed .status-dot{
-    background: var(--clay);
-    box-shadow: 0 0 0 3px rgba(187,97,50,0.25);
-  }
-  .status-hours{ color: var(--cream-dim); }
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-align: center;
+        }
 
-  /* nav tabs */
-  nav.tabs{
-    display:flex;
-    gap: 4px;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    scrollbar-width: none;
-  }
-  nav.tabs::-webkit-scrollbar{ display:none; }
-  .tab{
-    appearance: none;
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    color: var(--cream-dim);
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 15px;
-    padding: 14px 18px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
-  .tab:hover{ color: var(--cream); }
-  .tab.active{
-    color: var(--clay-bright);
-    border-bottom-color: var(--clay);
-  }
-  .tab:focus-visible{
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
 
-  /* ============ MAIN / MENU ============ */
-  main{ padding: 40px 0 120px; }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 15px;
+            transition: all 0.2s;
+            outline: none;
+            font-family: inherit;
+        }
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.2px;
+        }
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+        .btn-danger {
+            background: var(--danger);
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-sm {
+            padding: 8px 14px;
+            font-size: 13px;
+            border-radius: 8px;
+            width: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .flex-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .link {
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none !important;
+        }
 
-  .section-intro{
-    margin-bottom: 28px;
-  }
-  .section-intro .eyebrow{
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-  .section-intro h2{
-    font-family: var(--font-display);
-    font-size: clamp(24px, 3vw, 32px);
-    margin: 6px 0 4px;
-    font-weight: 600;
-  }
-  .section-intro p{
-    color: var(--cream-dim);
-    margin: 0;
-    max-width: 56ch;
-  }
+        /* Dashboard cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin: 24px 0;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+        .card-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .card-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .positive {
+            color: var(--success);
+        }
+        .negative {
+            color: var(--danger);
+        }
 
-  .grid{
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
-  }
+        /* Tabela */
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+        }
+        th {
+            background: var(--bg);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        td {
+            border-top: 1px solid var(--border);
+        }
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
 
-  .card{
-    background: var(--espresso-2);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 20px;
-    display:flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-  }
-  .card:hover{
-    transform: translateY(-4px);
-    border-color: rgba(187,97,50,0.4);
-    box-shadow: var(--shadow);
-  }
+        /* gráfico */
+        .chart-wrapper {
+            max-width: 400px;
+            margin: 24px auto;
+        }
 
-  .card-top{
-    display:flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .card-name{
-    font-family: var(--font-display);
-    font-size: 19px;
-    font-weight: 600;
-    margin: 0;
-    color: var(--cream);
-  }
-  .card-price{
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: 15px;
-    color: var(--gold);
-    white-space: nowrap;
-  }
-  .card-desc{
-    color: var(--cream-dim);
-    font-size: 14px;
-    margin: 0;
-    flex-grow: 1;
-  }
+        .toggle-theme {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            width: auto;
+            color: var(--text);
+        }
 
-  /* roast dial - signature element */
-  .roast{
-    display:flex;
-    align-items:center;
-    gap: 8px;
-  }
-  .roast-beans{ display:flex; gap: 4px; }
-  .roast-beans svg{ width: 15px; height: 15px; }
-  .bean-fill{ fill: var(--clay); }
-  .bean-empty{ fill: none; stroke: var(--cream-dim); stroke-width: 8; opacity: 0.5; }
-  .roast-label{
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--cream-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
 
-  .tag{
-    display:inline-flex;
-    align-self: flex-start;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 4px 10px;
-    border-radius: 100px;
-    color: var(--cream);
-  }
-  .tag.gelado{ background: rgba(75,90,60,0.35); border: 1px solid rgba(75,90,60,0.6); }
-  .tag.doce{ background: rgba(199,154,68,0.2); border: 1px solid rgba(199,154,68,0.5); }
-  .tag.salgado{ background: rgba(187,97,50,0.2); border: 1px solid rgba(187,97,50,0.5); }
-
-  .card-bottom{
-    display:flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 4px;
-  }
-
-  .add-btn{
-    appearance: none;
-    cursor: pointer;
-    background: var(--clay);
-    color: var(--espresso);
-    border: none;
-    font-weight: 700;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    padding: 9px 16px;
-    border-radius: 8px;
-    transition: background 0.2s ease, transform 0.1s ease;
-  }
-  .add-btn:hover{ background: var(--clay-bright); }
-  .add-btn:active{ transform: scale(0.95); }
-  .add-btn:focus-visible{ outline: 2px solid var(--gold); outline-offset: 2px; }
-
-  section.category{ display:none; }
-  section.category.active{ display:block; animation: fadeIn 0.35s ease; }
-
-  @keyframes fadeIn{
-    from{ opacity:0; transform: translateY(6px); }
-    to{ opacity:1; transform: translateY(0); }
-  }
-
-  /* ============ CART / RECIBO ============ */
-  .cart-fab{
-    position: fixed;
-    right: 22px;
-    bottom: 22px;
-    z-index: 40;
-    display:flex;
-    align-items:center;
-    gap: 10px;
-    background: var(--clay);
-    color: var(--espresso);
-    border: none;
-    border-radius: 100px;
-    padding: 14px 20px;
-    font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    transition: transform 0.15s ease, background 0.2s ease;
-  }
-  .cart-fab:hover{ background: var(--clay-bright); }
-  .cart-fab.bump{ animation: bump 0.35s ease; }
-  @keyframes bump{
-    0%{ transform: scale(1); }
-    40%{ transform: scale(1.12); }
-    100%{ transform: scale(1); }
-  }
-  .cart-fab svg{ width: 18px; height: 18px; }
-  .cart-count{
-    background: var(--espresso);
-    color: var(--cream);
-    border-radius: 100px;
-    min-width: 20px;
-    height: 20px;
-    display:flex; align-items:center; justify-content:center;
-    font-size: 11px;
-    padding: 0 6px;
-  }
-
-  .overlay{
-    position: fixed; inset:0;
-    background: rgba(0,0,0,0.5);
-    z-index: 45;
-    opacity:0;
-    pointer-events:none;
-    transition: opacity 0.25s ease;
-  }
-  .overlay.open{ opacity:1; pointer-events:auto; }
-
-  .receipt-panel{
-    position: fixed;
-    top:0; right:0; bottom:0;
-    width: min(380px, 92vw);
-    background: var(--paper);
-    color: var(--espresso);
-    z-index: 46;
-    transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(.2,.8,.2,1);
-    display:flex;
-    flex-direction: column;
-    box-shadow: -12px 0 40px rgba(0,0,0,0.4);
-  }
-  .receipt-panel.open{ transform: translateX(0); }
-
-  .receipt-head{
-    padding: 22px 22px 14px;
-    border-bottom: 1px dashed rgba(30,20,15,0.35);
-    text-align:center;
-    font-family: var(--font-mono);
-  }
-  .receipt-head h3{
-    font-family: var(--font-display);
-    font-size: 20px;
-    margin: 0 0 4px;
-  }
-  .receipt-head .sub{ font-size: 11px; color: rgba(30,20,15,0.6); }
-  .receipt-close{
-    position:absolute; top: 16px; right: 16px;
-    background:none; border:none; cursor:pointer;
-    font-family: var(--font-mono);
-    font-size: 18px;
-    color: rgba(30,20,15,0.6);
-    line-height:1;
-    padding: 4px;
-  }
-  .receipt-close:focus-visible{ outline: 2px solid var(--clay); }
-
-  .receipt-body{
-    flex-grow:1;
-    overflow-y:auto;
-    padding: 16px 22px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-  }
-  .receipt-empty{
-    text-align:center;
-    color: rgba(30,20,15,0.55);
-    padding: 40px 10px;
-  }
-  .receipt-line{
-    display:flex;
-    justify-content: space-between;
-    align-items:center;
-    gap: 8px;
-    padding: 10px 0;
-    border-bottom: 1px dotted rgba(30,20,15,0.25);
-  }
-  .receipt-line .name{ flex-grow:1; }
-  .receipt-line .qty-ctrl{
-    display:flex; align-items:center; gap: 6px;
-  }
-  .qty-btn{
-    width: 20px; height:20px;
-    border-radius: 4px;
-    border: 1px solid rgba(30,20,15,0.3);
-    background: transparent;
-    cursor:pointer;
-    font-family: var(--font-mono);
-    color: var(--espresso);
-    line-height: 1;
-  }
-  .qty-btn:hover{ background: rgba(30,20,15,0.08); }
-
-  .receipt-foot{
-    border-top: 1px dashed rgba(30,20,15,0.35);
-    padding: 16px 22px 22px;
-    font-family: var(--font-mono);
-  }
-  .receipt-total-row{
-    display:flex; justify-content: space-between;
-    font-size: 13px;
-    padding: 3px 0;
-    color: rgba(30,20,15,0.7);
-  }
-  .receipt-total-row.grand{
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--espresso);
-    padding-top: 8px;
-  }
-  .finish-btn{
-    margin-top: 14px;
-    width:100%;
-    padding: 13px;
-    border-radius: 8px;
-    border:none;
-    background: var(--espresso);
-    color: var(--cream);
-    font-weight: 700;
-    font-family: var(--font-mono);
-    cursor:pointer;
-    transition: background 0.2s ease;
-  }
-  .finish-btn:hover{ background: #000; }
-  .finish-btn:disabled{ opacity: 0.4; cursor:not-allowed; }
-
-  .toast{
-    position: fixed;
-    left: 50%;
-    bottom: -80px;
-    transform: translateX(-50%);
-    background: var(--forest);
-    color: var(--cream);
-    padding: 14px 22px;
-    border-radius: 10px;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    z-index: 60;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    transition: bottom 0.4s cubic-bezier(.2,.8,.2,1);
-    max-width: 90vw;
-    text-align:center;
-  }
-  .toast.show{ bottom: 30px; }
-
-  footer{
-    border-top: 1px solid var(--line);
-    padding: 34px 0 44px;
-    color: var(--cream-dim);
-    font-size: 13px;
-  }
-  footer .foot-grid{
-    display:flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 18px;
-  }
-  footer strong{ color: var(--cream); font-family: var(--font-display); font-size: 15px; }
-
-  @media (max-width: 640px){
-    .status-block{ align-items:flex-start; text-align:left; }
-    .board-inner{ flex-direction: column; }
-    .tagline{ margin-left: 0; }
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-    html{ scroll-behavior:auto; }
-  }
-</style>
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            .card-value {
+                font-size: 20px;
+            }
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<svg width="0" height="0" style="position:absolute">
-  <symbol id="bean" viewBox="0 0 100 100">
-    <path d="M50 4C25 4 6 26 6 52c0 26 20 44 44 44 24 0 44-18 44-44C94 26 75 4 50 4z"/>
-    <path d="M50 10c-14 10-14 30-2 40s12 30-2 40" fill="none" stroke="var(--espresso-2)" stroke-width="7" stroke-linecap="round"/>
-  </symbol>
-</svg>
-
-<header class="board">
-  <div class="wrap">
-    <div class="board-inner">
-      <div class="brand">
-        <div class="brand-mark">
-          <svg viewBox="0 0 100 100"><use href="#bean" class="bean-fill"/></svg>
-          <h1>Grão <em>&</em> Brasa</h1>
+    <div id="app" class="container">
+        <!-- Tela de Login/Cadastro -->
+        <div id="auth-screen">
+            <div class="logo">💰 FinanceHub</div>
+            <p class="subtitle" id="auth-subtitle">Faça login para continuar</p>
+            <form id="auth-form">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="auth-email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="auth-password" placeholder="********" required minlength="6">
+                </div>
+                <button type="submit" id="auth-btn">Entrar</button>
+            </form>
+            <p class="text-center" style="margin-top: 16px;">
+                <span id="toggle-auth-text">Não tem conta?</span>
+                <span class="link" id="toggle-auth-link">Cadastre-se</span>
+            </p>
         </div>
-        <p class="tagline">Torra artesanal, feita todo dia.</p>
-      </div>
-      <div class="status-block">
-        <span class="status-pill" id="statusPill">
-          <span class="status-dot"></span>
-          <span id="statusText">verificando horário…</span>
-        </span>
-        <span class="status-hours">Ter–Dom · 7h às 19h · Seg fechado</span>
-      </div>
+
+        <!-- Dashboard (oculto inicialmente) -->
+        <div id="dashboard-screen" class="app-container hidden">
+            <header>
+                <h2>📊 Dashboard</h2>
+                <div class="flex-row">
+                    <button id="theme-toggle" class="btn-outline btn-sm" style="width:auto;">🌓 Tema</button>
+                    <button id="logout-btn" class="btn-outline btn-sm" style="width:auto;">Sair</button>
+                </div>
+            </header>
+
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-label">Saldo Atual</div>
+                    <div class="card-value" id="saldo">R$ 0,00</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Receitas</div>
+                    <div class="card-value positive" id="total-receitas">R$ 0,00</div>
+                </div>
+                <div class="card">
+                    <div class="card-label">Despesas</div>
+                    <div class="card-value negative" id="total-despesas">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin: 24px 0;">
+                <div style="flex:1; min-width: 250px;">
+                    <h3>➕ Nova Receita</h3>
+                    <form id="receita-form" class="form-group">
+                        <input type="number" step="0.01" placeholder="Valor" id="r-valor" required>
+                        <select id="r-categoria" required>
+                            <option value="">Categoria</option>
+                            <option>Salário</option>
+                            <option>Freelance</option>
+                            <option>Investimentos</option>
+                            <option>Outros</option>
+                        </select>
+                        <input type="date" id="r-data" required>
+                        <input type="text" placeholder="Descrição" id="r-descricao">
+                        <button type="submit">Adicionar Receita</button>
+                    </form>
+                </div>
+                <div style="flex:1; min-width: 250px;">
+                    <h3>➖ Nova Despesa</h3>
+                    <form id="despesa-form" class="form-group">
+                        <input type="number" step="0.01" placeholder="Valor" id="d-valor" required>
+                        <select id="d-categoria" required>
+                            <option value="">Categoria</option>
+                            <option>Alimentação</option>
+                            <option>Transporte</option>
+                            <option>Moradia</option>
+                            <option>Lazer</option>
+                            <option>Saúde</option>
+                            <option>Outros</option>
+                        </select>
+                        <input type="date" id="d-data" required>
+                        <input type="text" placeholder="Descrição" id="d-descricao">
+                        <button type="submit">Adicionar Despesa</button>
+                    </form>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-top: 20px;">📋 Movimentações</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Categoria</th>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transacoes-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="chart-wrapper">
+                <canvas id="grafico"></canvas>
+            </div>
+        </div>
     </div>
-    <nav class="tabs" id="tabs" aria-label="Categorias do cardápio">
-      <button class="tab active" data-target="cafes">Cafés</button>
-      <button class="tab" data-target="gelados">Clássicos Gelados</button>
-      <button class="tab" data-target="doces">Doces</button>
-      <button class="tab" data-target="salgados">Salgados</button>
-    </nav>
-  </div>
-</header>
 
-<main class="wrap">
+    <script>
+        (function() {
+            // Estado da aplicação
+            const STATE = {
+                usuarioLogado: null, // email
+                transacoes: [],
+                chartInstance: null,
+                modoEscuro: false,
+                telaCadastro: false,
+                editandoId: null
+            };
 
-  <section class="category active" id="cafes">
-    <div class="section-intro">
-      <span class="eyebrow">01 — Na xícara</span>
-      <h2>Cafés</h2>
-      <p>Grãos torrados em pequenos lotes. A escala de torra vai de clara (mais ácida e floral) a escura (mais encorpada e amarga).</p>
-    </div>
-    <div class="grid" data-menu="cafes"></div>
-  </section>
+            // Elementos DOM
+            const authScreen = document.getElementById('auth-screen');
+            const dashboardScreen = document.getElementById('dashboard-screen');
+            const authForm = document.getElementById('auth-form');
+            const authEmail = document.getElementById('auth-email');
+            const authPassword = document.getElementById('auth-password');
+            const authBtn = document.getElementById('auth-btn');
+            const authSubtitle = document.getElementById('auth-subtitle');
+            const toggleAuthLink = document.getElementById('toggle-auth-link');
+            const toggleAuthText = document.getElementById('toggle-auth-text');
+            const themeToggle = document.getElementById('theme-toggle');
+            const logoutBtn = document.getElementById('logout-btn');
+            const receitaForm = document.getElementById('receita-form');
+            const despesaForm = document.getElementById('despesa-form');
+            const tbody = document.getElementById('transacoes-tbody');
+            const saldoEl = document.getElementById('saldo');
+            const totalReceitasEl = document.getElementById('total-receitas');
+            const totalDespesasEl = document.getElementById('total-despesas');
+            const graficoCanvas = document.getElementById('grafico');
 
-  <section class="category" id="gelados">
-    <div class="section-intro">
-      <span class="eyebrow">02 — Pra esquentar menos</span>
-      <h2>Clássicos Gelados</h2>
-      <p>Extrações frias e sobremesas de colher para os dias mais quentes.</p>
-    </div>
-    <div class="grid" data-menu="gelados"></div>
-  </section>
+            // Helpers localStorage
+            function getUsuarios() {
+                return JSON.parse(localStorage.getItem('financeiro_usuarios') || '[]');
+            }
+            function saveUsuarios(usuarios) {
+                localStorage.setItem('financeiro_usuarios', JSON.stringify(usuarios));
+            }
+            function getTransacoes(email) {
+                return JSON.parse(localStorage.getItem(`financeiro_transacoes_${email}`) || '[]');
+            }
+            function saveTransacoes(email, transacoes) {
+                localStorage.setItem(`financeiro_transacoes_${email}`, JSON.stringify(transacoes));
+            }
 
-  <section class="category" id="doces">
-    <div class="section-intro">
-      <span class="eyebrow">03 — Companhia do café</span>
-      <h2>Doces</h2>
-      <p>Feitos na cozinha da casa, todas as manhãs.</p>
-    </div>
-    <div class="grid" data-menu="doces"></div>
-  </section>
+            // Modo escuro
+            function aplicarTema() {
+                document.body.classList.toggle('dark', STATE.modoEscuro);
+            }
+            function carregarTema() {
+                const saved = localStorage.getItem('financeiro_tema');
+                STATE.modoEscuro = saved === 'dark';
+                aplicarTema();
+            }
+            themeToggle.addEventListener('click', () => {
+                STATE.modoEscuro = !STATE.modoEscuro;
+                aplicarTema();
+                localStorage.setItem('financeiro_tema', STATE.modoEscuro ? 'dark' : 'light');
+                // Re-renderiza gráfico se existir (cores)
+                if (STATE.chartInstance && dashboardScreen.classList.contains('hidden') === false) {
+                    atualizarGrafico();
+                }
+            });
 
-  <section class="category" id="salgados">
-    <div class="section-intro">
-      <span class="eyebrow">04 — Pra segurar a fome</span>
-      <h2>Salgados</h2>
-      <p>Opções assadas, servidas quentes na hora do pedido.</p>
-    </div>
-    <div class="grid" data-menu="salgados"></div>
-  </section>
+            // Autenticação
+            function mostrarAuth() {
+                dashboardScreen.classList.add('hidden');
+                authScreen.classList.remove('hidden');
+                authForm.reset();
+                atualizarTextosAuth();
+            }
 
-</main>
+            function mostrarDashboard() {
+                authScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+                carregarTransacoes();
+                atualizarUI();
+            }
 
-<footer class="wrap">
-  <div class="foot-grid">
-    <div>
-      <strong>Grão & Brasa</strong><br>
-      Rua das Palmeiras, 214 — Centro
-    </div>
-    <div>
-      Ter–Dom, 7h às 19h<br>
-      Segunda-feira: fechado
-    </div>
-    <div>
-      Cardápio sujeito a alteração<br>
-      conforme a safra do café.
-    </div>
-  </div>
-</footer>
+            function atualizarTextosAuth() {
+                if (STATE.telaCadastro) {
+                    authSubtitle.textContent = 'Crie sua conta';
+                    authBtn.textContent = 'Cadastrar';
+                    toggleAuthText.textContent = 'Já tem conta?';
+                    toggleAuthLink.textContent = 'Faça login';
+                } else {
+                    authSubtitle.textContent = 'Faça login para continuar';
+                    authBtn.textContent = 'Entrar';
+                    toggleAuthText.textContent = 'Não tem conta?';
+                    toggleAuthLink.textContent = 'Cadastre-se';
+                }
+            }
 
-<button class="cart-fab" id="cartFab" aria-label="Abrir sacola de pedidos">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8h12l-1 12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-  <span>Sacola</span>
-  <span class="cart-count" id="cartCount">0</span>
-</button>
+            toggleAuthLink.addEventListener('click', () => {
+                STATE.telaCadastro = !STATE.telaCadastro;
+                atualizarTextosAuth();
+            });
 
-<div class="overlay" id="overlay"></div>
+            authForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = authEmail.value.trim().toLowerCase();
+                const senha = authPassword.value.trim();
 
-<aside class="receipt-panel" id="receiptPanel" aria-label="Resumo do pedido">
-  <div class="receipt-head">
-    <button class="receipt-close" id="receiptClose" aria-label="Fechar sacola">×</button>
-    <h3>Grão & Brasa</h3>
-    <div class="sub">— comprovante de pedido —</div>
-  </div>
-  <div class="receipt-body" id="receiptBody">
-    <div class="receipt-empty">Sua sacola está vazia.<br>Toque em "adicionar" em algum item do cardápio.</div>
-  </div>
-  <div class="receipt-foot">
-    <div class="receipt-total-row"><span>subtotal</span><span id="subtotalVal">R$ 0,00</span></div>
-    <div class="receipt-total-row"><span>taxa de serviço (10%)</span><span id="serviceVal">R$ 0,00</span></div>
-    <div class="receipt-total-row grand"><span>total</span><span id="totalVal">R$ 0,00</span></div>
-    <button class="finish-btn" id="finishBtn" disabled>Finalizar pedido</button>
-  </div>
-</aside>
+                if (!email || !senha || senha.length < 6) {
+                    alert('Preencha email e senha (mínimo 6 caracteres).');
+                    return;
+                }
 
-<div class="toast" id="toast"></div>
+                const usuarios = getUsuarios();
+                if (STATE.telaCadastro) {
+                    // Cadastro
+                    const existe = usuarios.find(u => u.email === email);
+                    if (existe) {
+                        alert('Email já cadastrado.');
+                        return;
+                    }
+                    usuarios.push({ email, senha });
+                    saveUsuarios(usuarios);
+                    STATE.usuarioLogado = email;
+                    mostrarDashboard();
+                } else {
+                    // Login
+                    const usuario = usuarios.find(u => u.email === email && u.senha === senha);
+                    if (!usuario) {
+                        alert('Credenciais inválidas.');
+                        return;
+                    }
+                    STATE.usuarioLogado = email;
+                    mostrarDashboard();
+                }
+                STATE.telaCadastro = false;
+            });
 
-<script>
-(function(){
-  const MENU = {
-    cafes: [
-      { id:'c1', name:'Espresso Tradicional', desc:'Extração curta, encorpado e intenso.', price:6.50, roast:4 },
-      { id:'c2', name:'Cappuccino de Casa', desc:'Leite vaporizado, canela moída na hora.', price:9.00, roast:3 },
-      { id:'c3', name:'Flat White', desc:'Dose dupla, microespuma sedosa.', price:10.50, roast:3 },
-      { id:'c4', name:'Coado na Hora (V60)', desc:'Torra clara, notas florais e cítricas.', price:8.00, roast:2 },
-      { id:'c5', name:'Mocha de Cacau 70%', desc:'Chocolate amargo derretido no espresso.', price:11.00, roast:4 },
-    ],
-    gelados: [
-      { id:'g1', name:'Café Gelado com Leite de Coco', desc:'Espresso duplo, leite de coco e gelo em cubos.', price:12.00, tag:'gelado' },
-      { id:'g2', name:'Cold Brew 12h', desc:'Infusão a frio por 12 horas, suave e adocicado.', price:10.00, tag:'gelado' },
-      { id:'g3', name:'Affogato', desc:'Espresso quente servido sobre sorvete de creme.', price:13.00, tag:'gelado' },
-    ],
-    doces: [
-      { id:'d1', name:'Pão de Queijo Recheado', desc:'Massa de polvilho com recheio de catupiry.', price:7.00, tag:'doce' },
-      { id:'d2', name:'Bolo de Fubá com Goiabada', desc:'Fatia generosa, ainda morna.', price:9.50, tag:'doce' },
-      { id:'d3', name:'Brownie de Café', desc:'Chocolate meio amargo com pó de café na massa.', price:8.50, tag:'doce' },
-    ],
-    salgados: [
-      { id:'s1', name:'Coxinha de Frango Caipira', desc:'Massa lisa, recheio desfiado.', price:8.00, tag:'salgado' },
-      { id:'s2', name:'Torta de Palmito', desc:'Massa amanteigada, recheio cremoso.', price:9.00, tag:'salgado' },
-      { id:'s3', name:'Sanduíche de Queijo Coalho', desc:'Pão australiano, queijo grelhado na chapa.', price:12.00, tag:'salgado' },
-    ],
-  };
+            logoutBtn.addEventListener('click', () => {
+                STATE.usuarioLogado = null;
+                STATE.transacoes = [];
+                if (STATE.chartInstance) {
+                    STATE.chartInstance.destroy();
+                    STATE.chartInstance = null;
+                }
+                mostrarAuth();
+            });
 
-  const ROAST_LABELS = { 1:'Clara', 2:'Clara/Média', 3:'Média', 4:'Média/Escura', 5:'Escura' };
-  const TAG_LABELS = { gelado:'Gelado', doce:'Doce', salgado:'Salgado' };
+            // Transações
+            function carregarTransacoes() {
+                if (!STATE.usuarioLogado) return;
+                STATE.transacoes = getTransacoes(STATE.usuarioLogado);
+            }
 
-  function formatBRL(v){
-    return 'R$ ' + v.toFixed(2).replace('.', ',');
-  }
+            function salvarTransacoesLocal() {
+                if (!STATE.usuarioLogado) return;
+                saveTransacoes(STATE.usuarioLogado, STATE.transacoes);
+            }
 
-  function beanRow(level){
-    let html = '<div class="roast-beans">';
-    for(let i=1;i<=5;i++){
-      html += `<svg viewBox="0 0 100 100"><use href="#bean" class="${i<=level ? 'bean-fill' : 'bean-empty'}"/></svg>`;
-    }
-    html += '</div>';
-    return html;
-  }
+            function adicionarTransacao(tipo, valor, categoria, data, descricao) {
+                const transacao = {
+                    id: Date.now().toString(),
+                    tipo, // 'receita' ou 'despesa'
+                    valor: parseFloat(valor),
+                    categoria,
+                    data,
+                    descricao: descricao || ''
+                };
+                STATE.transacoes.push(transacao);
+                salvarTransacoesLocal();
+                atualizarUI();
+            }
 
-  function renderMenu(){
-    Object.keys(MENU).forEach(cat=>{
-      const container = document.querySelector(`[data-menu="${cat}"]`);
-      container.innerHTML = MENU[cat].map(item=>{
-        const meta = item.roast
-          ? `<div class="roast">${beanRow(item.roast)}<span class="roast-label">Torra ${ROAST_LABELS[item.roast]}</span></div>`
-          : `<span class="tag ${item.tag}">${TAG_LABELS[item.tag]}</span>`;
-        return `
-        <article class="card">
-          <div class="card-top">
-            <h3 class="card-name">${item.name}</h3>
-            <span class="card-price">${formatBRL(item.price)}</span>
-          </div>
-          <p class="card-desc">${item.desc}</p>
-          ${meta}
-          <div class="card-bottom">
-            <button class="add-btn" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">+ adicionar</button>
-          </div>
-        </article>`;
-      }).join('');
-    });
-  }
-  renderMenu();
+            function excluirTransacao(id) {
+                if (!confirm('Excluir este registro?')) return;
+                STATE.transacoes = STATE.transacoes.filter(t => t.id !== id);
+                salvarTransacoesLocal();
+                atualizarUI();
+            }
 
-  /* ---- tabs ---- */
-  const tabs = document.querySelectorAll('.tab');
-  tabs.forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      tabs.forEach(t=>t.classList.remove('active'));
-      tab.classList.add('active');
-      document.querySelectorAll('.category').forEach(sec=>sec.classList.remove('active'));
-      document.getElementById(tab.dataset.target).classList.add('active');
-    });
-  });
+            function editarTransacao(id) {
+                const t = STATE.transacoes.find(t => t.id === id);
+                if (!t) return;
+                // Preenche formulários baseado no tipo
+                if (t.tipo === 'receita') {
+                    document.getElementById('r-valor').value = t.valor;
+                    document.getElementById('r-categoria').value = t.categoria;
+                    document.getElementById('r-data').value = t.data;
+                    document.getElementById('r-descricao').value = t.descricao;
+                } else {
+                    document.getElementById('d-valor').value = t.valor;
+                    document.getElementById('d-categoria').value = t.categoria;
+                    document.getElementById('d-data').value = t.data;
+                    document.getElementById('d-descricao').value = t.descricao;
+                }
+                STATE.editandoId = id;
+                // scroll suave para formulários
+                window.scrollTo({ top: 200, behavior: 'smooth' });
+            }
 
-  /* ---- status aberto/fechado ---- */
-  function updateStatus(){
-    const now = new Date();
-    const day = now.getDay(); // 0 = domingo, 1 = segunda
-    const hour = now.getHours() + now.getMinutes()/60;
-    const pill = document.getElementById('statusPill');
-    const text = document.getElementById('statusText');
-    const isOpen = day !== 1 && hour >= 7 && hour < 19;
-    if(isOpen){
-      pill.classList.remove('closed');
-      text.textContent = 'aberto agora';
-    } else {
-      pill.classList.add('closed');
-      text.textContent = day === 1 ? 'fechado (segunda)' : 'fechado no momento';
-    }
-  }
-  updateStatus();
-  setInterval(updateStatus, 60000);
+            function atualizarUI() {
+                const receitas = STATE.transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + t.valor, 0);
+                const despesas = STATE.transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + t.valor, 0);
+                const saldo = receitas - despesas;
 
-  /* ---- carrinho ---- */
-  const cart = {}; // id -> {name, price, qty}
-  const cartFab = document.getElementById('cartFab');
-  const cartCount = document.getElementById('cartCount');
-  const overlay = document.getElementById('overlay');
-  const panel = document.getElementById('receiptPanel');
-  const receiptBody = document.getElementById('receiptBody');
-  const subtotalVal = document.getElementById('subtotalVal');
-  const serviceVal = document.getElementById('serviceVal');
-  const totalVal = document.getElementById('totalVal');
-  const finishBtn = document.getElementById('finishBtn');
-  const toast = document.getElementById('toast');
+                saldoEl.textContent = `R$ ${saldo.toFixed(2)}`;
+                saldoEl.className = `card-value ${saldo >= 0 ? 'positive' : 'negative'}`;
+                totalReceitasEl.textContent = `R$ ${receitas.toFixed(2)}`;
+                totalDespesasEl.textContent = `R$ ${despesas.toFixed(2)}`;
 
-  function openPanel(){
-    overlay.classList.add('open');
-    panel.classList.add('open');
-  }
-  function closePanel(){
-    overlay.classList.remove('open');
-    panel.classList.remove('open');
-  }
-  cartFab.addEventListener('click', openPanel);
-  overlay.addEventListener('click', closePanel);
-  document.getElementById('receiptClose').addEventListener('click', closePanel);
+                renderizarTabela();
+                atualizarGrafico();
+            }
 
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.add-btn');
-    if(!btn) return;
-    const id = btn.dataset.id;
-    if(!cart[id]){
-      cart[id] = { name: btn.dataset.name, price: parseFloat(btn.dataset.price), qty: 0 };
-    }
-    cart[id].qty += 1;
-    renderCart();
-    cartFab.classList.remove('bump');
-    void cartFab.offsetWidth;
-    cartFab.classList.add('bump');
-  });
+            function renderizarTabela() {
+                if (!STATE.transacoes.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-secondary);">Nenhuma movimentação.</td></tr>`;
+                    return;
+                }
+                const ordenadas = [...STATE.transacoes].sort((a, b) => new Date(b.data) - new Date(a.data));
+                tbody.innerHTML = ordenadas.map(t => `
+                    <tr>
+                        <td>${t.tipo === 'receita' ? '🟢 Receita' : '🔴 Despesa'}</td>
+                        <td class="${t.tipo === 'receita' ? 'positive' : 'negative'}">R$ ${t.valor.toFixed(2)}</td>
+                        <td>${t.categoria}</td>
+                        <td>${new Date(t.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                        <td>${t.descricao || '-'}</td>
+                        <td class="actions">
+                            <button class="btn-outline btn-sm" onclick="window.editarTransacao('${t.id}')">✏️</button>
+                            <button class="btn-danger btn-sm" onclick="window.excluirTransacao('${t.id}')">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
 
-  document.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.qty-btn');
-    if(!btn) return;
-    const id = btn.dataset.id;
-    const delta = parseInt(btn.dataset.delta, 10);
-    if(!cart[id]) return;
-    cart[id].qty += delta;
-    if(cart[id].qty <= 0) delete cart[id];
-    renderCart();
-  });
+            function atualizarGrafico() {
+                const receitas = STATE.transacoes.filter(t => t.tipo === 'receita').reduce((acc, t) => acc + t.valor, 0);
+                const despesas = STATE.transacoes.filter(t => t.tipo === 'despesa').reduce((acc, t) => acc + t.valor, 0);
 
-  function renderCart(){
-    const ids = Object.keys(cart);
-    const totalQty = ids.reduce((sum,id)=>sum+cart[id].qty, 0);
-    cartCount.textContent = totalQty;
+                if (STATE.chartInstance) {
+                    STATE.chartInstance.destroy();
+                }
 
-    if(ids.length === 0){
-      receiptBody.innerHTML = '<div class="receipt-empty">Sua sacola está vazia.<br>Toque em "adicionar" em algum item do cardápio.</div>';
-      finishBtn.disabled = true;
-    } else {
-      receiptBody.innerHTML = ids.map(id=>{
-        const item = cart[id];
-        return `
-        <div class="receipt-line">
-          <span class="name">${item.name}</span>
-          <div class="qty-ctrl">
-            <button class="qty-btn" data-id="${id}" data-delta="-1" aria-label="Diminuir">−</button>
-            <span>${item.qty}</span>
-            <button class="qty-btn" data-id="${id}" data-delta="1" aria-label="Aumentar">+</button>
-          </div>
-          <span>${formatBRL(item.price * item.qty)}</span>
-        </div>`;
-      }).join('');
-      finishBtn.disabled = false;
-    }
+                const ctx = graficoCanvas.getContext('2d');
+                const isDark = STATE.modoEscuro;
+                STATE.chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Receitas', 'Despesas'],
+                        datasets: [{
+                            data: [receitas, despesas],
+                            backgroundColor: [isDark ? '#34d399' : '#10b981', isDark ? '#f87171' : '#ef4444'],
+                            borderColor: isDark ? '#1e293b' : '#ffffff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: isDark ? '#f1f5f9' : '#1e293b'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
 
-    const subtotal = ids.reduce((sum,id)=>sum + cart[id].price * cart[id].qty, 0);
-    const service = subtotal * 0.10;
-    const total = subtotal + service;
-    subtotalVal.textContent = formatBRL(subtotal);
-    serviceVal.textContent = formatBRL(service);
-    totalVal.textContent = formatBRL(total);
-  }
-  renderCart();
+            // Expõe funções para onclick dinâmico
+            window.editarTransacao = editarTransacao;
+            window.excluirTransacao = excluirTransacao;
 
-  function showToast(msg){
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(()=> toast.classList.remove('show'), 3200);
-  }
+            // Eventos formulários
+            receitaForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const valor = document.getElementById('r-valor').value;
+                const categoria = document.getElementById('r-categoria').value;
+                const data = document.getElementById('r-data').value;
+                const descricao = document.getElementById('r-descricao').value;
+                if (!valor || !categoria || !data) {
+                    alert('Preencha campos obrigatórios.');
+                    return;
+                }
+                if (STATE.editandoId) {
+                    // Editar
+                    const t = STATE.transacoes.find(t => t.id === STATE.editandoId);
+                    if (t) {
+                        t.valor = parseFloat(valor);
+                        t.categoria = categoria;
+                        t.data = data;
+                        t.descricao = descricao;
+                        t.tipo = 'receita'; // garante tipo
+                    }
+                    STATE.editandoId = null;
+                } else {
+                    adicionarTransacao('receita', valor, categoria, data, descricao);
+                }
+                salvarTransacoesLocal();
+                receitaForm.reset();
+                atualizarUI();
+            });
 
-  finishBtn.addEventListener('click', ()=>{
-    if(Object.keys(cart).length === 0) return;
-    showToast('Pedido enviado! Retirada em cerca de 15 minutos.');
-    Object.keys(cart).forEach(id=> delete cart[id]);
-    renderCart();
-    setTimeout(closePanel, 900);
-  });
+            despesaForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const valor = document.getElementById('d-valor').value;
+                const categoria = document.getElementById('d-categoria').value;
+                const data = document.getElementById('d-data').value;
+                const descricao = document.getElementById('d-descricao').value;
+                if (!valor || !categoria || !data) {
+                    alert('Preencha campos obrigatórios.');
+                    return;
+                }
+                if (STATE.editandoId) {
+                    const t = STATE.transacoes.find(t => t.id === STATE.editandoId);
+                    if (t) {
+                        t.valor = parseFloat(valor);
+                        t.categoria = categoria;
+                        t.data = data;
+                        t.descricao = descricao;
+                        t.tipo = 'despesa';
+                    }
+                    STATE.editandoId = null;
+                } else {
+                    adicionarTransacao('despesa', valor, categoria, data, descricao);
+                }
+                salvarTransacoesLocal();
+                despesaForm.reset();
+                atualizarUI();
+            });
 
-})();
-</script>
+            // Inicialização
+            function init() {
+                carregarTema();
+                // Verifica se já existe usuário logado (poderia usar session, mas localStorage persiste)
+                // Por segurança, sempre inicia na tela de auth
+                mostrarAuth();
+                // Se quiser manter logado, poderia salvar email no sessionStorage e pular auth
+            }
 
+            init();
+        })();
+    </script>
 </body>
 </html>
